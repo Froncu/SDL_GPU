@@ -50,8 +50,6 @@ namespace fro
                .include_dir{ include_directory.data() },
                .defines{ defines.data() }, // TODO: has to be always nullptr terminated
                .shader_stage{ shader_stage },
-               .enable_debug{ enable_debug },
-               .name{ filename.c_str() },
                .props{ properties }
             };
 
@@ -59,6 +57,8 @@ namespace fro
             auto const byte_code{
                static_cast<Uint8 const* const>(SDL_ShaderCross_CompileSPIRVFromHLSL(&compile_info, &byte_code_size))
             };
+         	if (not byte_code)
+         		throw std::runtime_error{ std::format("failed to compile \"{}\" ({})!", path.string(), SDL_GetError()) };
 
             UniquePointer<SDL_ShaderCross_GraphicsShaderMetadata> const shader_data{
                SDL_ShaderCross_ReflectGraphicsSPIRV(byte_code, byte_code_size, properties),
@@ -73,10 +73,10 @@ namespace fro
                .entrypoint{ "main" },
                .format{ SDL_GPU_SHADERFORMAT_SPIRV }, // TODO: support multiple formats
                .stage{ static_cast<SDL_GPUShaderStage>(shader_stage) },
-               .num_samplers{ shader_data->num_samplers },
-               .num_storage_textures{ shader_data->num_storage_textures },
-               .num_storage_buffers{ shader_data->num_storage_buffers },
-               .num_uniform_buffers{ shader_data->num_uniform_buffers },
+               .num_samplers{ shader_data->resource_info.num_samplers },
+               .num_storage_textures{ shader_data->resource_info.num_storage_textures },
+               .num_storage_buffers{ shader_data->resource_info.num_storage_buffers },
+               .num_uniform_buffers{ shader_data->resource_info.num_uniform_buffers },
                .props{ properties }
             };
             UniquePointer<SDL_GPUShader> shader{

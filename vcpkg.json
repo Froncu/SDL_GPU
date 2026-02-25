@@ -1,0 +1,16 @@
+{
+   "dependencies": [
+      {
+         "name": "sdl3",
+         "platform": "!emscripten"
+      },
+      {
+         "name": "sdl3",
+         "features": ["emscripten-pthreads"],
+         "platform": "emscripten"
+      },
+      {
+         "name": "sdl3-shadercross"
+      }
+   ]
+}

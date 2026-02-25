@@ -4,6 +4,8 @@
 #include <filesystem>
 #include <vector>
 
+#include <SDL3_shadercross/SDL_shadercross.h>
+
 #include "utility/unique_pointer.hpp"
 
 struct SDL_GPUShader;
