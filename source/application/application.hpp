@@ -11,7 +11,12 @@
 namespace fro
 {
 	using Index = std::uint32_t;
-	using Vertex = std::pair<float, float>;
+
+	struct Vertex final
+	{
+		float x, y;
+		float r, g, b;
+	};
 
 	class Application final
 	{
@@ -60,25 +65,42 @@ namespace fro
 				},
 			};
 
-			SDL_GPUVertexAttribute const vertex_attributes{
-				.format{ SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2 },
+			std::array<SDL_GPUVertexAttribute const, 2> const attributes_{
+				{
+					{
+						.location{ 0 },
+						.buffer_slot{ 0 },
+						.format{ SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2 },
+						.offset{ 0 }
+					},
+					{
+						.location{ 1 },
+						.buffer_slot{ 0 },
+						.format{ SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3 },
+						.offset{ sizeof(float) * 2 }
+					}
+				}
 			};
 
-			SDL_GPUVertexBufferDescription const vertex_buffer_desciption{
-				.pitch{ sizeof(Vertex) },
-				.input_rate{ SDL_GPU_VERTEXINPUTRATE_VERTEX }
+			std::array<SDL_GPUVertexBufferDescription const, 1> const vertex_buffer_desciptions_{
+				{
+					{
+						.pitch{ sizeof(Vertex) },
+						.input_rate{ SDL_GPU_VERTEXINPUTRATE_VERTEX }
+					}
+				}
 			};
 
 			SDL_GPUGraphicsPipelineCreateInfo const pipeline_create_info_{
 				.vertex_shader{ &vertex_shader_.native_shader() },
 				.fragment_shader{ &fragment_shader_.native_shader() },
 				.vertex_input_state{
-					.vertex_buffer_descriptions{ &vertex_buffer_desciption },
-					.num_vertex_buffers{ 1 },
-					.vertex_attributes{ &vertex_attributes },
-					.num_vertex_attributes{ 1 }
+					.vertex_buffer_descriptions{ vertex_buffer_desciptions_.data() },
+					.num_vertex_buffers{ static_cast<Uint32>(vertex_buffer_desciptions_.size()) },
+					.vertex_attributes{ attributes_.data() },
+					.num_vertex_attributes{ static_cast<Uint32>(attributes_.size()) }
 				},
-				.primitive_type{ SDL_GPU_PRIMITIVETYPE_TRIANGLELIST },
+				.primitive_type{ SDL_GPU_PRIMITIVETYPE_TRIANGLESTRIP },
 				.rasterizer_state{
 					.fill_mode{ SDL_GPU_FILLMODE_FILL },
 					.cull_mode{ SDL_GPU_CULLMODE_BACK },
@@ -95,8 +117,20 @@ namespace fro
 				std::bind(SDL_ReleaseGPUGraphicsPipeline, gpu_device_.get(), std::placeholders::_1)
 			};
 
-			std::array<Index, 6> indices_{ 0, 1, 2, 2, 3, 0 };
-			std::array<Vertex, 4> vertices_{ { { -0.5f, -0.5f }, { 0.5f, -0.5f }, { 0.5f, 0.5f }, { -0.5f, 0.5f } } };
+			std::array<Index, 4> indices_{ 0, 1, 3, 2 };
+			UniquePointer<SDL_GPUBuffer> index_buffer_{};
+			SDL_GPUBufferBinding index_buffer_binding_{};
+
+			std::array<Vertex, 4> vertices_{
+				{
+					{ -0.5f, -0.5f, 1.0f, 0.0f, 0.0f }, // red
+					{ 0.5f, -0.5f, 0.0f, 1.0f, 0.0f }, // green
+					{ 0.5f, 0.5f, 0.0f, 0.0f, 1.0f }, // blue
+					{ -0.5f, 0.5f, 1.0f, 1.0f, 0.0f }, // yellow
+				}
+			};
+			UniquePointer<SDL_GPUBuffer> vertex_buffer_{};
+			SDL_GPUBufferBinding vertex_buffer_binding_{};
 	};
 }
 
