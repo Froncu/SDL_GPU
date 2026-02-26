@@ -9,9 +9,9 @@
 namespace fro
 {
    Shader::Shader(SDL_GPUDevice& gpu_device, std::filesystem::path const& path, std::string_view const entry_point,
-      std::string_view const include_directory, std::vector<SDL_ShaderCross_HLSL_Define> defines, bool const enable_debug)
+      std::string_view const include_directory, std::vector<SDL_ShaderCross_HLSL_Define> defines)
       : shader_{
-         [&gpu_device, &path, &entry_point, &include_directory, &defines, &enable_debug]
+         [&gpu_device, &path, &entry_point, &include_directory, &defines]
          {
             if (not std::filesystem::exists(path))
                throw std::runtime_error{ std::format("file \"{}\" does not exist!", path.string()) };

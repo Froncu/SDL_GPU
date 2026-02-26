@@ -17,8 +17,7 @@ namespace fro
    {
       public:
          explicit Shader(SDL_GPUDevice& gpu_device, std::filesystem::path const& path, std::string_view entry_point = "main",
-            std::string_view include_directory = "", std::vector<SDL_ShaderCross_HLSL_Define> defines = {},
-            bool enable_debug = false);
+            std::string_view include_directory = "", std::vector<SDL_ShaderCross_HLSL_Define> defines = {});
 
          [[nodiscard]] SDL_GPUShader& native_shader() const;
 
