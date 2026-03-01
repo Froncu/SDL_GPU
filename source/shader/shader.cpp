@@ -11,11 +11,11 @@ namespace fro
                throw std::runtime_error{ std::format("file \"{}\" does not exist!", path.string()) };
 
             if (not std::filesystem::is_regular_file(path))
-               throw std::runtime_error{ std::format("file \"{}\" is not a regular file!", path.string()) }; 
+               throw std::runtime_error{ std::format("file \"{}\" is not a regular file!", path.string()) };
 
             std::string source_code{};
             if (std::ifstream file{ path, std::ifstream::in }; file.is_open())
-               source_code.assign(std::istreambuf_iterator{ file }, std::istreambuf_iterator<char>{});
+               source_code.assign(std::istreambuf_iterator<char>{ file }, {});
             else
                throw std::runtime_error{ std::format("failed to open \"{}\"!", path.string()) };
 
@@ -34,8 +34,8 @@ namespace fro
                   std::format("the entry point for the \"{}\" shader cannot be empty!", path.string())
                };
 
-         	SDL_PropertiesID constexpr properties{}; // TODO: provide parameters for this
-         	defines.emplace_back(nullptr, nullptr);
+            SDL_PropertiesID constexpr properties{}; // TODO: provide parameters for this
+            defines.emplace_back(nullptr, nullptr);
             SDL_ShaderCross_HLSL_Info const compile_info{
                .source{ source_code.c_str() },
                .entrypoint{ entry_point.data() },
@@ -49,8 +49,8 @@ namespace fro
             auto const byte_code{
                static_cast<Uint8 const* const>(SDL_ShaderCross_CompileSPIRVFromHLSL(&compile_info, &byte_code_size))
             };
-         	if (not byte_code)
-         		throw std::runtime_error{ std::format("failed to compile \"{}\" ({})!", path.string(), SDL_GetError()) };
+            if (not byte_code)
+               throw std::runtime_error{ std::format("failed to compile \"{}\" ({})!", path.string(), SDL_GetError()) };
 
             UniquePointer<SDL_ShaderCross_GraphicsShaderMetadata> const shader_data{
                SDL_ShaderCross_ReflectGraphicsSPIRV(byte_code, byte_code_size, properties),
