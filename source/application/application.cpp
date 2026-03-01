@@ -140,27 +140,18 @@ namespace fro
       SDL_BindGPUIndexBuffer(&render_pass, &index_buffer_binding_, SDL_GPU_INDEXELEMENTSIZE_32BIT);
       SDL_BindGPUVertexBuffers(&render_pass, 0, &vertex_buffer_binding_, 1);
 
-      glm::mat4 projection{ glm::perspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f, 100.0f) };
-      glm::mat4 view{
-         glm::lookAt(
-            glm::vec3{ 0.0f, 0.0f, 2.0f },
-            glm::vec3{ 0.0f, 0.0f, 0.0f },
-            glm::vec3{ 0.0f, 1.0f, 0.0f }
-         )
-      };
-
-      camera_ = projection * view;
+      camera_.move(movement_);
 
       Transforms t1{
-         .view_projection{ camera_ },
+         .camera{ camera_.matrix() },
          .model{ glm::translate(glm::mat4(1.0f), { -0.1f, 0.0f, 0.6f }) },
       };
       SDL_PushGPUVertexUniformData(command_buffer, 0, &t1, sizeof(t1));
       SDL_DrawGPUIndexedPrimitives(&render_pass, 6, 1, 0, 0, 0);
 
       Transforms t2{
-         .view_projection{ camera_ },
-         .model{ glm::translate(glm::mat4(1.0f), { 0.1f, 0.0f, 0.0f }) },
+         .camera{ camera_.matrix() },
+         .model{ glm::translate(glm::mat4(1.0f), { 0.1f, 0.0f, -0.2f }) },
       };
       SDL_PushGPUVertexUniformData(command_buffer, 0, &t2, sizeof(t2));
       SDL_DrawGPUIndexedPrimitives(&render_pass, 6, 1, 0, 0, 0);
@@ -177,6 +168,19 @@ namespace fro
       {
          case SDL_EVENT_QUIT:
             return false;
+
+         case SDL_EVENT_MOUSE_MOTION:
+            switch (event.motion.state)
+            {
+               case SDL_BUTTON_LMASK:
+                  camera_.move({ -event.motion.xrel * movement_speed_, event.motion.yrel * movement_speed_, 0.0f });
+                  break;
+
+               case SDL_BUTTON_RMASK:
+                  camera_.move({ 0.0f, 0.0f, -event.motion.yrel * movement_speed_ });
+                  break;
+            }
+            return true;
 
          default:
             return true;

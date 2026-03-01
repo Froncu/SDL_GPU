@@ -1,6 +1,7 @@
 ﻿#ifndef APPLICATION_HPP
 #define APPLICATION_HPP
 
+#include "camera/camera.hpp"
 #include "pch.hpp"
 #include "shader/shader.hpp"
 #include "utility/unique_pointer.hpp"
@@ -17,7 +18,7 @@ namespace fro
 
    struct Transforms
    {
-      glm::mat4 view_projection;
+      glm::mat4 camera;
       glm::mat4 model;
    };
 
@@ -142,7 +143,7 @@ namespace fro
          UniquePointer<SDL_GPUBuffer> vertex_buffer_{};
          SDL_GPUBufferBinding vertex_buffer_binding_{};
 
-         glm::mat4 camera_{ 1.0f };
+         Camera camera_{};
 
          SDL_GPUTextureCreateInfo const depth_texture_create_info{
             .type{ SDL_GPU_TEXTURETYPE_2D },
@@ -158,6 +159,9 @@ namespace fro
             SDL_CreateGPUTexture(gpu_device_.get(), &depth_texture_create_info),
             std::bind(SDL_ReleaseGPUTexture, gpu_device_.get(), std::placeholders::_1)
          };
+
+         glm::vec3 movement_{};
+         float movement_speed_{ 0.005f };
    };
 }
 
