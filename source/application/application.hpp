@@ -3,18 +3,13 @@
 
 #include "camera/camera.hpp"
 #include "pch.hpp"
+#include "scene/vertex.hpp"
 #include "shader/shader.hpp"
 #include "utility/unique_pointer.hpp"
 
 namespace fro
 {
    using Index = std::uint32_t;
-
-   struct Vertex final
-   {
-      float x, y;
-      float r, g, b;
-   };
 
    struct Transforms
    {
@@ -69,40 +64,14 @@ namespace fro
             },
          };
 
-         std::array<SDL_GPUVertexAttribute const, 2> const attributes_{
-            {
-               {
-                  .location{ 0 },
-                  .buffer_slot{ 0 },
-                  .format{ SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2 },
-                  .offset{ 0 }
-               },
-               {
-                  .location{ 1 },
-                  .buffer_slot{ 0 },
-                  .format{ SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3 },
-                  .offset{ sizeof(float) * 2 }
-               }
-            }
-         };
-
-         std::array<SDL_GPUVertexBufferDescription const, 1> const vertex_buffer_desciptions_{
-            {
-               {
-                  .pitch{ sizeof(Vertex) },
-                  .input_rate{ SDL_GPU_VERTEXINPUTRATE_VERTEX }
-               }
-            }
-         };
-
          SDL_GPUGraphicsPipelineCreateInfo const pipeline_create_info_{
             .vertex_shader{ &vertex_shader_.native_shader() },
             .fragment_shader{ &fragment_shader_.native_shader() },
             .vertex_input_state{
-               .vertex_buffer_descriptions{ vertex_buffer_desciptions_.data() },
-               .num_vertex_buffers{ static_cast<Uint32>(vertex_buffer_desciptions_.size()) },
-               .vertex_attributes{ attributes_.data() },
-               .num_vertex_attributes{ static_cast<Uint32>(attributes_.size()) }
+               .vertex_buffer_descriptions{ Vertex::BUFFER_DESCRIPTIONS.data() },
+               .num_vertex_buffers{ static_cast<Uint32>(Vertex::BUFFER_DESCRIPTIONS.size()) },
+               .vertex_attributes{ Vertex::ATTRIBUTES.data() },
+               .num_vertex_attributes{ static_cast<Uint32>(Vertex::ATTRIBUTES.size()) }
             },
             .primitive_type{ SDL_GPU_PRIMITIVETYPE_TRIANGLESTRIP },
             .rasterizer_state{
@@ -134,10 +103,10 @@ namespace fro
 
          std::array<Vertex, 4> vertices_{
             {
-               { -0.5f, -0.5f, 1.0f, 0.0f, 0.0f }, // red
-               { 0.5f, -0.5f, 0.0f, 1.0f, 0.0f }, // green
-               { 0.5f, 0.5f, 0.0f, 0.0f, 1.0f }, // blue
-               { -0.5f, 0.5f, 1.0f, 1.0f, 0.0f }, // yellow
+               { { -0.5f, -0.5f }, { 1.0f, 0.0f, 0.0f } }, // red
+               { { 0.5f, -0.5f }, { 0.0f, 1.0f, 0.0f } }, // green
+               { { 0.5f, 0.5f }, { 0.0f, 0.0f, 1.0f } }, // blue
+               { { -0.5f, 0.5f }, { 1.0f, 1.0f, 0.0f } }, // yellow
             }
          };
          UniquePointer<SDL_GPUBuffer> vertex_buffer_{};
