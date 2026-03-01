@@ -1,9 +1,3 @@
-#include <fstream>
-#include <format>
-
-#include <SDL3/SDL.h>
-#include <SDL3_shadercross/SDL_shadercross.h>
-
 #include "shader.hpp"
 
 namespace fro

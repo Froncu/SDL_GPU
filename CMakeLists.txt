@@ -18,7 +18,7 @@ target_compile_options(${PROJECT_NAME}
 find_package(SDL3 CONFIG REQUIRED COMPONENTS SDL3-static)
 find_package(SDL3_shadercross CONFIG REQUIRED COMPONENTS SDL3_shadercross-static)
 find_package(glm CONFIG REQUIRED)
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries(${PROJECT_NAME}
    PRIVATE SDL3::SDL3
    PRIVATE SDL3_shadercross::SDL3_shadercross
    PRIVATE glm::glm-header-only)
@@ -27,7 +27,10 @@ add_custom_command(POST_BUILD TARGET ${PROJECT_NAME}
    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
    ${CMAKE_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources)
 
-if(EMSCRIPTEN)
+if (NOT EMSCRIPTEN)
+   target_precompile_headers(${PROJECT_NAME}
+      PRIVATE source/pch.hpp)
+else ()
    set(EMSCRIPTEN_WEB_DIRECTORY ${CMAKE_SOURCE_DIR}/web)
    set(EMSCRIPTEN_SHELL_FILE ${EMSCRIPTEN_WEB_DIRECTORY}/shell.html)
 
@@ -50,4 +53,4 @@ if(EMSCRIPTEN)
       USES_TERMINAL
       COMMAND node server.js -d ${CMAKE_BINARY_DIR} -f ${PROJECT_NAME}.html
       WORKING_DIRECTORY ${EMSCRIPTEN_WEB_DIRECTORY})
-endif()
+endif ()

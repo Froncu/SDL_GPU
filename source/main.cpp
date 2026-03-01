@@ -1,15 +1,8 @@
-#include <chrono>
-#include <filesystem>
-#include <functional>
-#include <memory>
-#include <print>
-
 #define SDL_MAIN_USE_CALLBACKS
-#include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-#include <SDL3_shadercross/SDL_shadercross.h>
 
 #include "application/application.hpp"
+#include "pch.hpp"
 #include "shader/shader.hpp"
 #include "utility/unique_pointer.hpp"
 

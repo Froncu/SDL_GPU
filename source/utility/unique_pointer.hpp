@@ -1,8 +1,7 @@
 #ifndef UNIQUE_POINTER_HPP
 #define UNIQUE_POINTER_HPP
 
-#include <memory>
-#include <functional>
+#include "pch.hpp"
 
 namespace fro
 {

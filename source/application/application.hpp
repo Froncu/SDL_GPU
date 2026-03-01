@@ -1,11 +1,7 @@
 ﻿#ifndef APPLICATION_HPP
 #define APPLICATION_HPP
 
-#include <array>
-
-#include <glm/glm.hpp>
-#include <SDL3/SDL.h>
-
+#include "pch.hpp"
 #include "shader/shader.hpp"
 #include "utility/unique_pointer.hpp"
 

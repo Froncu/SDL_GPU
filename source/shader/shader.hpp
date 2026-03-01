@@ -1,11 +1,7 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
-#include <filesystem>
-#include <vector>
-
-#include <SDL3_shadercross/SDL_shadercross.h>
-
+#include "pch.hpp"
 #include "utility/unique_pointer.hpp"
 
 struct SDL_GPUShader;
