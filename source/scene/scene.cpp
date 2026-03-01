@@ -1,4 +1,5 @@
-﻿#include "scene.hpp"
+﻿#include "index.hpp"
+#include "scene.hpp"
 #include "vertex.hpp"
 
 Scene::Scene(SDL_GPUDevice& gpu_device, std::filesystem::path const& path)
@@ -26,7 +27,7 @@ Scene::Scene(SDL_GPUDevice& gpu_device, std::filesystem::path const& path)
    std::int32_t vertex_offset{};
    std::uint32_t index_offset{};
    std::vector<Vertex> vertices{};
-   std::vector<std::uint32_t> indices{};
+   std::vector<Index> indices{};
    for (aiMesh const* const mesh : std::span{ scene->mMeshes, scene->mMeshes + scene->mNumMeshes })
    {
       std::uint32_t const vertex_count{ mesh->mNumVertices };
@@ -45,7 +46,7 @@ Scene::Scene(SDL_GPUDevice& gpu_device, std::filesystem::path const& path)
       indices.reserve(indices.size() + index_count);
       for (aiFace const& face : std::span{ mesh->mFaces, mesh->mFaces + mesh->mNumFaces })
          for (std::uint32_t const index : std::span{ face.mIndices, face.mIndices + face.mNumIndices })
-            indices.push_back(index);
+            indices.push_back(static_cast<decltype(indices)::value_type>(index));
 
       sub_meshes_.push_back({
          .vertex_offset{ vertex_offset },
@@ -78,7 +79,7 @@ Scene::Scene(SDL_GPUDevice& gpu_device, std::filesystem::path const& path)
 
    SDL_GPUTransferBufferCreateInfo const index_transfer_buffer_create_info{
       .usage{ SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD },
-      .size{ static_cast<Uint32>(sizeof(decltype(indices)::value_type) * indices.size()) },
+      .size{ index_buffer_create_info.size },
    };
 
    UniquePointer<SDL_GPUTransferBuffer> const index_transfer_buffer{
@@ -87,7 +88,7 @@ Scene::Scene(SDL_GPUDevice& gpu_device, std::filesystem::path const& path)
    };
 
    std::ranges::copy(indices,
-      static_cast<decltype(indices)::value_type*>(SDL_MapGPUTransferBuffer(&gpu_device, index_transfer_buffer.get(), true)));
+      static_cast<decltype(indices)::value_type*>(SDL_MapGPUTransferBuffer(&gpu_device, index_transfer_buffer.get(), false)));
 
    SDL_UnmapGPUTransferBuffer(&gpu_device, index_transfer_buffer.get());
 
@@ -102,7 +103,7 @@ Scene::Scene(SDL_GPUDevice& gpu_device, std::filesystem::path const& path)
 
    SDL_GPUBufferCreateInfo const vertex_buffer_create_info{
       .usage{ SDL_GPU_BUFFERUSAGE_VERTEX },
-      .size{ static_cast<Uint32>(sizeof(Vertex) * vertices.size()) },
+      .size{ static_cast<Uint32>(sizeof(decltype(vertices)::value_type) * vertices.size()) },
    };
 
    vertex_buffer_ = {
@@ -121,7 +122,7 @@ Scene::Scene(SDL_GPUDevice& gpu_device, std::filesystem::path const& path)
    };
 
    std::ranges::copy(vertices,
-      static_cast<Vertex*>(SDL_MapGPUTransferBuffer(&gpu_device, vertex_transfer_buffer.get(), true)));
+      static_cast<decltype(vertices)::value_type*>(SDL_MapGPUTransferBuffer(&gpu_device, vertex_transfer_buffer.get(), false)));
 
    SDL_UnmapGPUTransferBuffer(&gpu_device, vertex_transfer_buffer.get());
 
@@ -131,7 +132,7 @@ Scene::Scene(SDL_GPUDevice& gpu_device, std::filesystem::path const& path)
 
    SDL_GPUBufferRegion const vertex_buffer_region{
       .buffer{ vertex_buffer_.get() },
-      .size{ vertex_buffer_create_info.size }
+      .size{ vertex_transfer_buffer_create_info.size }
    };
 
    SDL_GPUCommandBuffer* const command_buffer{ SDL_AcquireGPUCommandBuffer(&gpu_device) };

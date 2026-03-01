@@ -1,7 +1,23 @@
 ﻿#include "application.hpp"
+#include "scene/index.hpp"
 
 Application::Application()
 {
+   int width;
+   int height;
+   SDL_GetWindowSize(window_.get(), &width, &height);
+
+   SDL_Event event{
+      .window{
+         .type{ SDL_EVENT_WINDOW_RESIZED },
+         .timestamp{ SDL_GetTicksNS() },
+         .windowID{ SDL_GetWindowID(window_.get()) },
+         .data1{ width },
+         .data2{ height }
+      }
+   };
+
+   SDL_PushEvent(&event);
 }
 
 Application::~Application()
@@ -29,8 +45,6 @@ void Application::tick()
       return;
    }
 
-   SDL_PushGPUVertexUniformData(command_buffer, 0, &camera_, sizeof(camera_));
-
    SDL_GPUColorTargetInfo const color_target_info{
       .texture{ swap_chain_texture },
       .clear_color{ 0.1f, 0.1f, 0.1f, 1.0f },
@@ -47,7 +61,7 @@ void Application::tick()
 
    SDL_GPURenderPass& render_pass{ *SDL_BeginGPURenderPass(command_buffer, &color_target_info, 1, &depth_target_info) };
    SDL_BindGPUGraphicsPipeline(&render_pass, pipeline_.get());
-   SDL_BindGPUIndexBuffer(&render_pass, &index_buffer_binding, SDL_GPU_INDEXELEMENTSIZE_32BIT);
+   SDL_BindGPUIndexBuffer(&render_pass, &index_buffer_binding, INDEX_SIZE);
    SDL_BindGPUVertexBuffers(&render_pass, 0, &vertex_buffer_binding, 1);
 
    camera_.move(movement_);

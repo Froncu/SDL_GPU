@@ -2,13 +2,12 @@
 #define APPLICATION_HPP
 
 #include "camera/camera.hpp"
+#include "constants.hpp"
 #include "pch.hpp"
 #include "scene/scene.hpp"
 #include "scene/vertex.hpp"
 #include "shader/shader.hpp"
 #include "utility/unique_pointer.hpp"
-
-using Index = std::uint32_t;
 
 struct Transforms
 {
@@ -40,7 +39,7 @@ class Application final
       };
 
       UniquePointer<SDL_GPUDevice> const gpu_device_{
-         SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, true, nullptr),
+         SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, DEBUG, nullptr),
          SDL_DestroyGPUDevice
       };
 
@@ -106,8 +105,8 @@ class Application final
          .type{ SDL_GPU_TEXTURETYPE_2D },
          .format{ SDL_GPU_TEXTUREFORMAT_D32_FLOAT },
          .usage{ SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET },
-         .width{ 1280 },
-         .height{ 720 },
+         .width{ 1 },
+         .height{ 1 },
          .layer_count_or_depth{ 1 },
          .num_levels{ 1 },
       };
