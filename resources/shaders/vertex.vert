@@ -1,5 +1,5 @@
 struct Input {
-    float2 Position : POSITION;
+    float3 Position : POSITION;
     float3 Color    : TEXCOORD0;
 };
 
@@ -16,7 +16,7 @@ cbuffer Transforms : register(b0, space1)
 
 Output main(Input input) {
     Output output;
-    output.Position = mul(Camera, mul(Model, float4(input.Position, 0.0f, 1.0f)));
+    output.Position = mul(Camera, mul(Model, float4(input.Position, 1.0f)));
     output.Color    = float4(input.Color, 1.0f);
     return output;
 }

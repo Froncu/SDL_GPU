@@ -10,6 +10,7 @@
          "platform": "emscripten"
       },
       "sdl3-shadercross",
-      "glm"
+      "glm",
+      "assimp"
    ]
 }

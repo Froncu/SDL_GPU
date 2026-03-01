@@ -5,14 +5,14 @@ decltype(Vertex::ATTRIBUTES) Vertex::ATTRIBUTES{
       {
          .location{ 0 },
          .buffer_slot{ 0 },
-         .format{ SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2 },
-         .offset{ 0 }
+         .format{ SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3 },
+         .offset{ offsetof(Vertex, position) }
       },
       {
          .location{ 1 },
          .buffer_slot{ 0 },
          .format{ SDL_GPU_VERTEXELEMENTFORMAT_FLOAT3 },
-         .offset{ sizeof(float) * 2 }
+         .offset{ offsetof(Vertex, color) }
       }
    }
 };
