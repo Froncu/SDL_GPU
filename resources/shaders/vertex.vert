@@ -1,6 +1,10 @@
 struct Input {
-    float3 Position : POSITION;
-    float3 Color    : TEXCOORD0;
+    float4 Color               : TEXCOORD0;
+    float3 Position            : TEXCOORD1;
+    float3 Normal              : TEXCOORD2;
+    float3 Tangent             : TEXCOORD3;
+    float3 Bitangent           : TEXCOORD4;
+    float2 TextureCoordinates  : TEXCOORD5;
 };
 
 struct Output {
@@ -17,6 +21,6 @@ cbuffer Transforms : register(b0, space1)
 Output main(Input input) {
     Output output;
     output.Position = mul(Camera, mul(Model, float4(input.Position, 1.0f)));
-    output.Color    = float4(input.Color, 1.0f);
+    output.Color = float4(input.Normal, 1.0f);
     return output;
 }

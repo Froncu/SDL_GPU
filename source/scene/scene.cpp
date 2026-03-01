@@ -30,16 +30,17 @@ Scene::Scene(SDL_GPUDevice& gpu_device, std::filesystem::path const& path)
    std::vector<Index> indices{};
    for (aiMesh const* const mesh : std::span{ scene->mMeshes, scene->mMeshes + scene->mNumMeshes })
    {
+      // TODO: handle multiple color and texture coordinate channels as well as possibly missing normals information
       std::uint32_t const vertex_count{ mesh->mNumVertices };
       vertices.reserve(vertices.size() + vertex_count);
       for (std::uint32_t index{}; index < vertex_count; ++index)
          vertices.push_back({
+            .color{ mesh->mColors[0] ? std::bit_cast<glm::vec4>(mesh->mColors[0][index]) : glm::vec4{ 1.0f } },
             .position{ mesh->mVertices[index].x, mesh->mVertices[index].y, mesh->mVertices[index].z },
-            .color{ 1.0f, 0.0f, 0.0f },
-            // .uv{ mesh->mTextureCoords[0][index].x, mesh->mTextureCoords[0][index].y },
-            // .normal{ mesh->mNormals[index].x, mesh->mNormals[index].y, mesh->mNormals[index].z },
-            // .tangent{ mesh->mTangents[index].x, mesh->mTangents[index].y, mesh->mTangents[index].z },
-            // .bitangent{ mesh->mBitangents[index].x, mesh->mBitangents[index].y, mesh->mBitangents[index].z }
+            .normal{ mesh->mNormals[index].x, mesh->mNormals[index].y, mesh->mNormals[index].z },
+            .tangent{ mesh->mTangents[index].x, mesh->mTangents[index].y, mesh->mTangents[index].z },
+            .bitangent{ mesh->mBitangents[index].x, mesh->mBitangents[index].y, mesh->mBitangents[index].z },
+            .texture_coordinates{ mesh->mTextureCoords[0][index].x, mesh->mTextureCoords[0][index].y },
          });
 
       std::uint32_t const index_count{ mesh->mNumFaces * 3 };

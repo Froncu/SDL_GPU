@@ -73,20 +73,20 @@ class Application final
          },
          .primitive_type{ SDL_GPU_PRIMITIVETYPE_TRIANGLELIST },
          .rasterizer_state{
-            .fill_mode{ SDL_GPU_FILLMODE_LINE },
+            .fill_mode{ SDL_GPU_FILLMODE_FILL },
             .cull_mode{ SDL_GPU_CULLMODE_BACK },
-            .front_face{ SDL_GPU_FRONTFACE_COUNTER_CLOCKWISE }
+            .front_face{ SDL_GPU_FRONTFACE_CLOCKWISE }
          },
          .depth_stencil_state{
-            .compare_op{ SDL_GPU_COMPAREOP_LESS },
+            .compare_op{ SDL_GPU_COMPAREOP_LESS_OR_EQUAL },
             .enable_depth_test{ true },
-            .enable_depth_write{ true },
+            .enable_depth_write{ true }
          },
          .target_info{
             .color_target_descriptions{ &color_target_description_ },
             .num_color_targets{ 1 },
             .depth_stencil_format{ SDL_GPU_TEXTUREFORMAT_D32_FLOAT },
-            .has_depth_stencil_target{ true },
+            .has_depth_stencil_target{ true }
          }
       };
 

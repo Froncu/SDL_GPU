@@ -1,6 +1,7 @@
 ﻿#ifndef PCH_HPP
 #define PCH_HPP
 
+#define GLM_FORCE_LEFT_HANDED
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
 #include <array>

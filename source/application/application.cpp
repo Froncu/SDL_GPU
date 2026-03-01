@@ -92,7 +92,7 @@ bool Application::process_event(SDL_Event& event)
          switch (event.motion.state)
          {
             case SDL_BUTTON_LMASK:
-               camera_.move({ -event.motion.xrel * movement_speed_, event.motion.yrel * movement_speed_, 0.0f });
+               camera_.move({ event.motion.xrel * movement_speed_, event.motion.yrel * movement_speed_, 0.0f });
                break;
 
             case SDL_BUTTON_RMASK:
