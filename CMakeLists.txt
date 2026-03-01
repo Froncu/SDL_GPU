@@ -17,9 +17,11 @@ target_compile_options(${PROJECT_NAME}
 
 find_package(SDL3 CONFIG REQUIRED COMPONENTS SDL3-static)
 find_package(SDL3_shadercross CONFIG REQUIRED COMPONENTS SDL3_shadercross-static)
+find_package(glm CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} 
    PRIVATE SDL3::SDL3
-   PRIVATE SDL3_shadercross::SDL3_shadercross)
+   PRIVATE SDL3_shadercross::SDL3_shadercross
+   PRIVATE glm::glm-header-only)
 
 add_custom_command(POST_BUILD TARGET ${PROJECT_NAME}
    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different

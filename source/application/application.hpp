@@ -3,6 +3,7 @@
 
 #include <array>
 
+#include <glm/glm.hpp>
 #include <SDL3/SDL.h>
 
 #include "shader/shader.hpp"
@@ -16,6 +17,12 @@ namespace fro
 	{
 		float x, y;
 		float r, g, b;
+	};
+
+	struct Transforms
+	{
+		glm::mat4 view_projection;
+		glm::mat4 model;
 	};
 
 	class Application final
@@ -106,9 +113,16 @@ namespace fro
 					.cull_mode{ SDL_GPU_CULLMODE_BACK },
 					.front_face{ SDL_GPU_FRONTFACE_COUNTER_CLOCKWISE }
 				},
+				.depth_stencil_state{
+					.compare_op{ SDL_GPU_COMPAREOP_LESS },
+					.enable_depth_test{ true },
+					.enable_depth_write{ true },
+				},
 				.target_info{
 					.color_target_descriptions{ &color_target_description_ },
-					.num_color_targets{ 1 }
+					.num_color_targets{ 1 },
+					.depth_stencil_format{ SDL_GPU_TEXTUREFORMAT_D32_FLOAT },
+					.has_depth_stencil_target{ true },
 				}
 			};
 
@@ -131,6 +145,23 @@ namespace fro
 			};
 			UniquePointer<SDL_GPUBuffer> vertex_buffer_{};
 			SDL_GPUBufferBinding vertex_buffer_binding_{};
+
+			glm::mat4 camera_{ 1.0f };
+
+			SDL_GPUTextureCreateInfo const depth_texture_create_info{
+				.type{ SDL_GPU_TEXTURETYPE_2D },
+				.format{ SDL_GPU_TEXTUREFORMAT_D32_FLOAT },
+				.usage{ SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET },
+				.width{ 1280 },
+				.height{ 720 },
+				.layer_count_or_depth{ 1 },
+				.num_levels{ 1 },
+			};
+
+			UniquePointer<SDL_GPUTexture> depth_texture_{
+				SDL_CreateGPUTexture(gpu_device_.get(), &depth_texture_create_info),
+				std::bind(SDL_ReleaseGPUTexture, gpu_device_.get(), std::placeholders::_1)
+			};
 	};
 }
 

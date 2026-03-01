@@ -1,6 +1,9 @@
 ﻿#include <print>
 #include <span>
 
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "application.hpp"
 
 namespace fro
@@ -121,6 +124,9 @@ namespace fro
 			return;
 		}
 
+		// camera_ = glm::rotate(camera_, 0.001f, { 0.0f, 1.0f, 0.0f });
+		SDL_PushGPUVertexUniformData(command_buffer, 0, &camera_, sizeof(camera_));
+
 		SDL_GPUColorTargetInfo const color_target_info{
 			.texture{ swap_chain_texture },
 			.clear_color{ 0.1f, 0.1f, 0.1f, 1.0f },
@@ -128,11 +134,43 @@ namespace fro
 			.store_op{ SDL_GPU_STOREOP_STORE },
 		};
 
-		SDL_GPURenderPass& render_pass{ *SDL_BeginGPURenderPass(command_buffer, &color_target_info, 1, nullptr) };
+		SDL_GPUDepthStencilTargetInfo const depth_target_info{
+			.texture{ depth_texture_.get() },
+			.clear_depth{ 1.0f },
+			.load_op{ SDL_GPU_LOADOP_CLEAR },
+			.store_op{ SDL_GPU_STOREOP_DONT_CARE },
+		};
+
+		SDL_GPURenderPass& render_pass{ *SDL_BeginGPURenderPass(command_buffer, &color_target_info, 1, &depth_target_info) };
 		SDL_BindGPUGraphicsPipeline(&render_pass, pipeline_.get());
 		SDL_BindGPUIndexBuffer(&render_pass, &index_buffer_binding_, SDL_GPU_INDEXELEMENTSIZE_32BIT);
 		SDL_BindGPUVertexBuffers(&render_pass, 0, &vertex_buffer_binding_, 1);
-		SDL_DrawGPUIndexedPrimitives(&render_pass, static_cast<Uint32>(indices_.size()), 1, 0, 0, 0);
+
+		glm::mat4 projection{ glm::perspective(glm::radians(60.0f), 1280.0f / 720.0f, 0.1f, 100.0f) };
+		glm::mat4 view{
+			glm::lookAt(
+				glm::vec3{ 0.0f, 0.0f, 2.0f },
+				glm::vec3{ 0.0f, 0.0f, 0.0f },
+				glm::vec3{ 0.0f, 1.0f, 0.0f }
+			)
+		};
+
+		camera_ = projection * view;
+
+		Transforms t1{
+			.view_projection{ camera_ },
+			.model{ glm::translate(glm::mat4(1.0f), { -0.1f, 0.0f, 0.6f }) },
+		};
+		SDL_PushGPUVertexUniformData(command_buffer, 0, &t1, sizeof(t1));
+		SDL_DrawGPUIndexedPrimitives(&render_pass, 6, 1, 0, 0, 0);
+
+		Transforms t2{
+			.view_projection{ camera_ },
+			.model{ glm::translate(glm::mat4(1.0f), { 0.1f, 0.0f, 0.0f }) },
+		};
+		SDL_PushGPUVertexUniformData(command_buffer, 0, &t2, sizeof(t2));
+		SDL_DrawGPUIndexedPrimitives(&render_pass, 6, 1, 0, 0, 0);
+
 		SDL_EndGPURenderPass(&render_pass);
 
 		if (not SDL_SubmitGPUCommandBuffer(command_buffer))

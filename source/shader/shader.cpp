@@ -21,7 +21,7 @@ namespace fro
 
             std::string source_code{};
             if (std::ifstream file{ path, std::ifstream::in }; file.is_open())
-               source_code.assign(std::istreambuf_iterator(file), std::istreambuf_iterator<char>());
+               source_code.assign(std::istreambuf_iterator{ file }, std::istreambuf_iterator<char>{});
             else
                throw std::runtime_error{ std::format("failed to open \"{}\"!", path.string()) };
 
@@ -40,15 +40,13 @@ namespace fro
                   std::format("the entry point for the \"{}\" shader cannot be empty!", path.string())
                };
 
-            // TODO: provide parameters for this
-            SDL_PropertiesID constexpr properties{};
-
-            std::string const filename{ path.filename().string() };
+         	SDL_PropertiesID constexpr properties{}; // TODO: provide parameters for this
+         	defines.emplace_back(nullptr, nullptr);
             SDL_ShaderCross_HLSL_Info const compile_info{
                .source{ source_code.c_str() },
                .entrypoint{ entry_point.data() },
                .include_dir{ include_directory.data() },
-               .defines{ defines.data() }, // TODO: has to be always nullptr terminated
+               .defines{ defines.data() },
                .shader_stage{ shader_stage },
                .props{ properties }
             };
