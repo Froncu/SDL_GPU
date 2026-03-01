@@ -75,10 +75,11 @@ class Application final
          .rasterizer_state{
             .fill_mode{ SDL_GPU_FILLMODE_FILL },
             .cull_mode{ SDL_GPU_CULLMODE_BACK },
-            .front_face{ SDL_GPU_FRONTFACE_CLOCKWISE }
+            .front_face{ SDL_GPU_FRONTFACE_CLOCKWISE },
+            .enable_depth_clip{ true }
          },
          .depth_stencil_state{
-            .compare_op{ SDL_GPU_COMPAREOP_LESS_OR_EQUAL },
+            .compare_op{ SDL_GPU_COMPAREOP_LESS },
             .enable_depth_test{ true },
             .enable_depth_write{ true }
          },
