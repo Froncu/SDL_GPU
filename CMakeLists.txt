@@ -25,9 +25,11 @@ target_link_libraries(${PROJECT_NAME}
    PRIVATE glm::glm-header-only
    PRIVATE assimp::assimp)
 
-add_custom_command(POST_BUILD TARGET ${PROJECT_NAME}
+add_custom_target(copy_resources ALL
    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
    ${CMAKE_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources)
+
+add_dependencies(${PROJECT_NAME} copy_resources)
 
 if (NOT EMSCRIPTEN)
    target_precompile_headers(${PROJECT_NAME}
