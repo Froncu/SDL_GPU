@@ -87,6 +87,13 @@ bool Application::process_event(SDL_Event& event)
          }
          return true;
 
+      case SDL_EVENT_WINDOW_RESIZED:
+         depth_texture_create_info.width = event.window.data1;
+         depth_texture_create_info.height = event.window.data2;
+         depth_texture_.reset(SDL_CreateGPUTexture(gpu_device_.get(), &depth_texture_create_info));
+         camera_.change_aspect_ratio(static_cast<float>(event.window.data1) / event.window.data2);
+         return true;
+
       default:
          return true;
    }

@@ -102,7 +102,7 @@ class Application final
 
       Camera camera_{};
 
-      SDL_GPUTextureCreateInfo const depth_texture_create_info{
+      SDL_GPUTextureCreateInfo depth_texture_create_info{
          .type{ SDL_GPU_TEXTURETYPE_2D },
          .format{ SDL_GPU_TEXTUREFORMAT_D32_FLOAT },
          .usage{ SDL_GPU_TEXTUREUSAGE_DEPTH_STENCIL_TARGET },
