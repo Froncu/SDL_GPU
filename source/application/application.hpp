@@ -20,7 +20,7 @@ namespace fro
    class Application final
    {
       public:
-         Application();
+         Application(std::span<char const* const> const arguments);
          Application(Application const&) = delete;
          Application(Application&&) = delete;
 

@@ -6,10 +6,10 @@
 #include "shader/shader.hpp"
 #include "utility/unique_pointer.hpp"
 
-SDL_AppResult SDL_AppInit(void** const app_state, int const, char** const) try
+SDL_AppResult SDL_AppInit(void** const app_state, int const argument_count, char** const arguments) try
 {
    SDL_InitSubSystem(SDL_INIT_VIDEO);
-   *app_state = new fro::Application();
+   *app_state = new fro::Application{ { arguments, static_cast<std::size_t>(argument_count) } };
    return SDL_APP_CONTINUE;
 }
 catch (std::exception& exception)

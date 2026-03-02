@@ -3,7 +3,7 @@
 
 namespace fro
 {
-   Application::Application()
+   Application::Application(std::span<char const* const> const)
    {
       int width;
       int height;

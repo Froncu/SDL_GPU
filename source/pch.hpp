@@ -12,6 +12,7 @@
 #include <memory>
 #include <numeric>
 #include <print>
+#include <ranges>
 #include <span>
 
 #include <assimp/Importer.hpp>
