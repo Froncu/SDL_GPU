@@ -46,7 +46,7 @@ namespace fro
             };
 
             std::size_t byte_code_size;
-            auto const byte_code{
+            auto byte_code{
                static_cast<Uint8 const* const>(SDL_ShaderCross_CompileSPIRVFromHLSL(&compile_info, &byte_code_size))
             };
             if (not byte_code)
@@ -59,11 +59,46 @@ namespace fro
             if (not shader_data)
                throw std::runtime_error{ std::format("failed to reflect \"{}\" data ({})!", path.string(), SDL_GetError()) };
 
+            SDL_GPUShaderFormat const supported_formats{ SDL_GetGPUShaderFormats(&gpu_device) };
+            SDL_GPUShaderFormat picked_format;
+            if (supported_formats & SDL_GPU_SHADERFORMAT_SPIRV)
+               picked_format = SDL_GPU_SHADERFORMAT_SPIRV;
+            else
+            {
+               SDL_ShaderCross_SPIRV_Info const spirv_info{
+                  .bytecode{ byte_code },
+                  .bytecode_size{ byte_code_size },
+                  .entrypoint{ entry_point.data() },
+                  .shader_stage{ shader_stage },
+                  .props{ properties }
+               };
+
+               if (supported_formats & SDL_GPU_SHADERFORMAT_DXIL)
+               {
+                  picked_format = SDL_GPU_SHADERFORMAT_DXIL;
+                  byte_code = static_cast<Uint8 const* const>(
+                     SDL_ShaderCross_CompileDXILFromSPIRV(&spirv_info, &byte_code_size));
+               }
+               else if (supported_formats & SDL_GPU_SHADERFORMAT_DXBC)
+               {
+                  picked_format = SDL_GPU_SHADERFORMAT_DXBC;
+                  byte_code = static_cast<Uint8 const* const>(
+                     SDL_ShaderCross_CompileDXBCFromSPIRV(&spirv_info, &byte_code_size));
+               }
+               else
+                  throw std::runtime_error{
+                     std::format("failed to detect a supported shader format for \"{}\"!", path.string())
+                  };
+
+               if (not byte_code)
+                  throw std::runtime_error{ std::format("failed to compile \"{}\" ({})!", path.string(), SDL_GetError()) };
+            }
+
             SDL_GPUShaderCreateInfo const create_info{
                .code_size{ byte_code_size },
                .code{ byte_code },
                .entrypoint{ "main" },
-               .format{ SDL_GPU_SHADERFORMAT_SPIRV }, // TODO: support multiple formats
+               .format{ picked_format },
                .stage{ static_cast<SDL_GPUShaderStage>(shader_stage) },
                .num_samplers{ shader_data->resource_info.num_samplers },
                .num_storage_textures{ shader_data->resource_info.num_storage_textures },

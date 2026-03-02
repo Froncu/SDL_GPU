@@ -41,7 +41,11 @@ namespace fro
          };
 
          UniquePointer<SDL_GPUDevice> const gpu_device_{
-            SDL_CreateGPUDevice(SDL_GPU_SHADERFORMAT_SPIRV, DEBUG, nullptr),
+            SDL_CreateGPUDevice(
+               SDL_GPU_SHADERFORMAT_SPIRV |
+               SDL_GPU_SHADERFORMAT_DXBC |
+               SDL_GPU_SHADERFORMAT_DXIL,
+               DEBUG, nullptr),
             SDL_DestroyGPUDevice
          };
 

@@ -4,9 +4,6 @@
 #include "pch.hpp"
 #include "utility/unique_pointer.hpp"
 
-struct SDL_GPUShader;
-struct SDL_GPUDevice;
-
 namespace fro
 {
    class Shader final
