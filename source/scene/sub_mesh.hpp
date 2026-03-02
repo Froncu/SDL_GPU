@@ -3,11 +3,14 @@
 
 #include "pch.hpp"
 
-struct SubMesh final
+namespace fro
 {
-   std::int32_t vertex_offset;
-   std::uint32_t index_offset;
-   std::uint32_t index_count;
-};
+   struct SubMesh final
+   {
+      std::int32_t vertex_offset;
+      std::uint32_t index_offset;
+      std::uint32_t index_count;
+   };
+}
 
 #endif //SUB_MESH_HPP

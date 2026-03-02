@@ -7,7 +7,8 @@
 struct SDL_GPUShader;
 struct SDL_GPUDevice;
 
-
+namespace fro
+{
    class Shader final
    {
       public:
@@ -19,5 +20,6 @@ struct SDL_GPUDevice;
       private:
          UniquePointer<SDL_GPUShader> shader_;
    };
+}
 
 #endif
