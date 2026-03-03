@@ -36,7 +36,7 @@ namespace fro
          float aspect_ratio_{ 1.0f };
          float near_plane_{ 0.1f };
          float far_plane_{ 100.0f };
-         glm::vec3 position_{ 0.0f, 0.0f, -1.0f };
+         glm::vec3 position_{ -0.75f, 0.25f, -1.0f };
 
          mutable glm::mat4 matrix_{ compute_matrix() };
          mutable bool dirty_{ false };
