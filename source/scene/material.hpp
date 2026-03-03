@@ -1,0 +1,16 @@
+﻿#ifndef MATERIAL_HPP
+#define MATERIAL_HPP
+
+#include "pch.hpp"
+
+namespace fro
+{
+   class Material final
+   {
+      std::int32_t base_color_index{ -1 };
+      std::int32_t normal_index{ -1 };
+      std::int32_t metalness_index{ -1 };
+   };
+}
+
+#endif

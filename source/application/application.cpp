@@ -11,20 +11,27 @@ namespace fro
          std::bind(SDL_ReleaseGPUSampler, gpu_device_.get(), std::placeholders::_1),
       };
 
-      UniquePointer<SDL_Surface> base_color{
-         IMG_Load("resources/test.png"),
+      UniquePointer<SDL_Surface> leather{
+         IMG_Load("resources/leather.png"),
          SDL_DestroySurface
       };
 
-      base_color.reset(SDL_ConvertSurface(base_color.get(), SDL_PIXELFORMAT_RGBA32));
+      leather.reset(SDL_ConvertSurface(leather.get(), SDL_PIXELFORMAT_RGBA32));
+
+      UniquePointer<SDL_Surface> plastic{
+         IMG_Load("resources/plastic.png"),
+         SDL_DestroySurface
+      };
+
+      plastic.reset(SDL_ConvertSurface(plastic.get(), SDL_PIXELFORMAT_RGBA32));
 
       SDL_GPUTextureCreateInfo const texture_create_info{
-         .type{ SDL_GPU_TEXTURETYPE_2D },
+         .type{ SDL_GPU_TEXTURETYPE_2D_ARRAY },
          .format{ SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM_SRGB },
          .usage{ SDL_GPU_TEXTUREUSAGE_SAMPLER },
-         .width{ static_cast<Uint32>(base_color->w) },
-         .height{ static_cast<Uint32>(base_color->h) },
-         .layer_count_or_depth{ 1 },
+         .width{ static_cast<Uint32>(leather->w) },
+         .height{ static_cast<Uint32>(leather->h) },
+         .layer_count_or_depth{ 10 },
          .num_levels{ 1 }
       };
 
@@ -33,16 +40,10 @@ namespace fro
          std::bind(SDL_ReleaseGPUTexture, gpu_device_.get(), std::placeholders::_1),
       };
 
-      SDL_GPUTextureRegion const texture_region{
-         .texture{ base_color_texture_.get() },
-         .w{ static_cast<Uint32>(base_color->w) },
-         .h{ static_cast<Uint32>(base_color->h) },
-         .d{ 1 }
-      };
-
+      auto const image_size{ static_cast<Uint32>(leather->pitch * leather->h) };
       SDL_GPUTransferBufferCreateInfo const transfer_buffer_create_info{
          .usage{ SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD },
-         .size{ static_cast<Uint32>(base_color->pitch * base_color->h) }
+         .size{ image_size * 10 }
       };
 
       UniquePointer<SDL_GPUTransferBuffer> const transfer_buffer{
@@ -50,13 +51,51 @@ namespace fro
          std::bind(SDL_ReleaseGPUTransferBuffer, gpu_device_.get(), std::placeholders::_1),
       };
 
-      std::memcpy(
-         SDL_MapGPUTransferBuffer(
-            gpu_device_.get(), transfer_buffer.get(), false), base_color->pixels, transfer_buffer_create_info.size);
+      auto* const transfer_data{
+         std::bit_cast<std::uint8_t*>(SDL_MapGPUTransferBuffer(gpu_device_.get(), transfer_buffer.get(), false))
+      };
+
+      std::memcpy(transfer_data, leather->pixels, image_size);
+      std::memcpy(transfer_data + image_size, plastic->pixels, image_size);
+      std::memcpy(transfer_data + image_size * 3, leather->pixels, image_size);
       SDL_UnmapGPUTransferBuffer(gpu_device_.get(), transfer_buffer.get());
 
-      SDL_GPUTextureTransferInfo const texture_transfer_info{
+      SDL_GPUTextureTransferInfo const leather_transfer_info{
          .transfer_buffer{ transfer_buffer.get() }
+      };
+
+      SDL_GPUTextureRegion const leather_region{
+         .texture{ base_color_texture_.get() },
+         .layer{ 0 },
+         .w{ static_cast<Uint32>(leather->w) },
+         .h{ static_cast<Uint32>(leather->h) },
+         .d{ 1 }
+      };
+
+      SDL_GPUTextureTransferInfo const plastic_transfer_info{
+         .transfer_buffer{ transfer_buffer.get() },
+         .offset{ image_size }
+      };
+
+      SDL_GPUTextureRegion const plastic_region{
+         .texture{ base_color_texture_.get() },
+         .layer{ 1 },
+         .w{ static_cast<Uint32>(leather->w) },
+         .h{ static_cast<Uint32>(leather->h) },
+         .d{ 1 }
+      };
+
+      SDL_GPUTextureTransferInfo const leather_transfer_info2{
+         .transfer_buffer{ transfer_buffer.get() },
+         .offset{ image_size * 3 }
+      };
+
+      SDL_GPUTextureRegion const leather_region2{
+         .texture{ base_color_texture_.get() },
+         .layer{ 3 },
+         .w{ static_cast<Uint32>(leather->w) },
+         .h{ static_cast<Uint32>(leather->h) },
+         .d{ 1 }
       };
 
       SDL_GPUCommandBuffer* const command_buffer{ SDL_AcquireGPUCommandBuffer(gpu_device_.get()) };
@@ -64,7 +103,9 @@ namespace fro
          std::abort();
 
       SDL_GPUCopyPass& copy_pass{ *SDL_BeginGPUCopyPass(command_buffer) };
-      SDL_UploadToGPUTexture(&copy_pass, &texture_transfer_info, &texture_region, false);
+      SDL_UploadToGPUTexture(&copy_pass, &leather_transfer_info, &leather_region, false);
+      SDL_UploadToGPUTexture(&copy_pass, &plastic_transfer_info, &plastic_region, false);
+      SDL_UploadToGPUTexture(&copy_pass, &leather_transfer_info2, &leather_region2, false);
       SDL_EndGPUCopyPass(&copy_pass);
       SDL_SubmitGPUCommandBuffer(command_buffer);
 
@@ -142,7 +183,8 @@ namespace fro
          .sampler{ sampler_.get() }
       };
       SDL_BindGPUFragmentSamplers(&render_pass, 0, &texture_sampler_binding, 1);
-
+      std::uint32_t const material_index{ 0 };
+      SDL_PushGPUFragmentUniformData(command_buffer, 0, &material_index, sizeof(material_index));
       for (SubMesh const& sub_mesh : scene_.sub_meshes())
          SDL_DrawGPUIndexedPrimitives(&render_pass, sub_mesh.index_count, 1, sub_mesh.index_offset, sub_mesh.vertex_offset, 0);
 

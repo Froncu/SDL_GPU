@@ -55,7 +55,7 @@ namespace fro
             .vertex_offset{ vertex_offset },
             .index_offset{ index_offset },
             .index_count{ index_count },
-            // .material_index{ mesh->mMaterialIndex }
+            .material_index{ mesh->mMaterialIndex }
          });
 
          vertex_offset += vertex_count;
