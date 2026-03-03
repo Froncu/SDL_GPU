@@ -20,6 +20,7 @@
 #include <assimp/scene.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <SDL3/SDL.h>
+#include <SDL3_image/SDL_image.h>
 #include <SDL3_shadercross/SDL_shadercross.h>
 
 #endif

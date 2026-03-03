@@ -125,6 +125,9 @@ namespace fro
 
          glm::vec3 movement_{};
          float movement_speed_{ 0.005f };
+
+         UniquePointer<SDL_GPUSampler> sampler_;
+         UniquePointer<SDL_GPUTexture> base_color_texture_;
    };
 }
 

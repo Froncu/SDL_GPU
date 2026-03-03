@@ -9,6 +9,10 @@
          "features": ["emscripten-pthreads"],
          "platform": "emscripten"
       },
+      {
+         "name": "sdl3-image",
+         "features": ["jpeg", "png"]
+      },
       "sdl3-shadercross",
       "glm",
       "assimp"
