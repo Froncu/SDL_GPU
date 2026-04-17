@@ -1,2 +1,14 @@
-.idea/
-build/
+/*
+
+!resources
+!eruptor
+!source
+!vcpkg
+
+!.clang-format
+!.clang-tidy
+!.gitignore
+!.gitmodules
+!CMakeLists.txt
+!CMakePresets.json
+!vcpkg.json
