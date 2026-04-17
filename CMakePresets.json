@@ -9,16 +9,6 @@
          "cacheVariables" : {
             "VCPKG_MANIFEST_DIR" : "${sourceDir}"
          }
-      },
-      {
-         "name": "emscripten",
-         "inherits" : "default",
-         "generator" : "Ninja",
-         "cacheVariables": {
-            "CMAKE_BUILD_TYPE": "Release",
-            "VCPKG_CHAINLOAD_TOOLCHAIN_FILE" : "$env{EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake",
-            "VCPKG_INSTALL_OPTIONS": "--allow-unsupported"
-         }
       }
    ],
    "buildPresets" : [
